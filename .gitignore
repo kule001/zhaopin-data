@@ -1,0 +1,7 @@
+# 忽略文件
+*.pyc
+__pycache__/
+.workbuddy/
+manual_entries.json
+extract_data.py
+.DS_Store
