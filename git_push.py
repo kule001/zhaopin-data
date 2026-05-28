@@ -83,21 +83,21 @@ def upload_file():
     result = github_request("PUT", url, body)
 
     if result and "content" in result:
-        print(f"  ✅ 上传成功: {result['content']['html_url']}")
+        print(f"  [OK] Upload: {result['content']['html_url']}")
         return True
     return False
 
 
 def main():
     print(f"=== GitHub API Upload ===")
-    print(f"时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"仓库: {REPO}")
-    print(f"文件: {FILE_PATH}")
+    print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Repo: {REPO}")
+    print(f"File: {FILE_PATH}")
 
     if upload_file():
-        print("✅ 完成")
+        print("[OK] Done")
     else:
-        print("❌ 失败")
+        print("[FAIL] Upload failed")
         sys.exit(1)
 
 
