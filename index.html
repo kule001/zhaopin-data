@@ -47,6 +47,16 @@
   .filter-group select:focus,
   .filter-group input:focus { border-color: var(--primary); }
 
+  /* Toggle switch */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle-row label { margin-bottom: 0 !important; }
+  .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .toggle-slider { position: absolute; inset: 0; background: #ccc; border-radius: 24px; cursor: pointer; transition: .3s; }
+  .toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+  .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
 
   .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
   .search-input { width: 280px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; outline: none; }
@@ -66,6 +76,9 @@
   .inst-card .card-footer { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px; }
   .inst-card .card-footer .ratio { color: #e67e22; font-weight: 600; }
   .inst-card .card-footer .deadline { color: #d93025; }
+  .inst-card.urgent { border-left-color: #ff6b35; }
+  .inst-card.urgent .deadline { color: #fff; background: #d93025; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .inst-card.expired { opacity: 0.55; }
   .inst-card .exam-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; margin-left: 6px; font-weight: 500; }
   .exam-A { background: #e3f2fd; color: #1565c0; }
   .exam-B { background: #f3e5f5; color: #7b1fa2; }
@@ -90,11 +103,11 @@
     position: fixed; bottom: 32px; right: 32px; z-index: 999;
     width: 56px; height: 56px; border-radius: 50%;
     background: var(--primary); color: #fff; border: none;
-    cursor: pointer; box-shadow: 0 4px 16px rgba(37,99,235,0.4);
+    cursor: pointer; box-shadow: 0 4px 16px rgba(217,48,37,0.4);
     font-size: 22px; display: flex; align-items: center; justify-content: center;
     transition: all .3s;
   }
-  .float-refresh:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37,99,235,0.5); }
+  .float-refresh:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(217,48,37,0.5); }
   .float-refresh.spinning { pointer-events: none; }
   .float-refresh.spinning svg { animation: spin .8s linear infinite; }
   .float-refresh .tooltip {
@@ -251,6 +264,15 @@
             <option value="E">E类 — 医疗卫生</option>
           </select>
         </div>
+        <div class="filter-group">
+          <div class="toggle-row">
+            <label>仅看报名中</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="activeOnlyToggle" onchange="applyFilters()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
         <div class="filter-group" style="margin-bottom:0;">
           <button id="resetBtn" onclick="resetFilters()" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);cursor:pointer;font-size:13px;color:var(--text-secondary);transition:all .2s;">重置筛选条件</button>
         </div>
@@ -260,7 +282,7 @@
     <div class="content">
       <div class="toolbar">
         <span class="result-count" id="resultCount">共 <strong>—</strong> 个单位</span>
-        <input type="text" class="search-input" id="searchInput" placeholder="搜索单位名称..." oninput="applyFilters()">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索单位/岗位/专业..." oninput="applyFilters()">
         <select id="sortSelect" onchange="applyFilters()" style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;background:#fff;">
           <option value="default">默认排序</option>
           <option value="ratio_asc">竞争比 低→高</option>
@@ -325,12 +347,6 @@ const provinceCityMap = {
   "重庆": ["渝中区","江北区","沙坪坝区","南岸区","九龙坡区","渝北区","巴南区","北碚区","万州区","涪陵区"]
 };
 
-const institutionTypes = [
-  "服务中心","管理局","中心","办公室","研究院","学院","医院","图书馆","文化馆","博物馆",
-  "监测站","管理站","保护中心","发展中心","信息中心","培训中心","检验中心","执法队",
-  "管理处","保障中心","技术中心","规划院","设计院","建设中心","环境监测站"
-];
-
 // ==================== DATA LOADING ====================
 // 数据源: jsDelivr CDN (国内可访问), 回退本地 data.json
 const DATA_SOURCES = [
@@ -386,13 +402,9 @@ async function loadData() {
   document.getElementById('precisionBadge').textContent = dataMetadata.precision || '★★★';
   document.getElementById('refreshInfo').textContent = '来源: ' + sourceUsed + ' · ' + (dataMetadata.totalEntries || rawEntries.length) + '条';
 
-  // 生成数据
+  // 生成数据并应用筛选（含 URL 恢复的筛选条件）
   allData = generateInstitutions();
-  filteredData = [...allData];
-  currentPage = 1;
-  updateStats();
-  renderCards();
-  renderPagination();
+  _applyFilters();
   return true;
 }
 
@@ -457,12 +469,23 @@ function pickMatchingTemplate(examCat, rng) {
   return { ...candidates[Math.floor(rng() * candidates.length)] };
 }
 
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 function generateInstitutions() {
   const data = [];
   let id = 1;
 
   for (const entry of rawEntries) {
-    const rng = seededRandom(id * 1000);
+    // 基于 entry 内容生成稳定种子，同一岗位每次生成相同数据
+    const seedKey = entry.name + '|' + entry.province + '|' + entry.city + '|' + entry.deadline + '|' + entry.hireCount;
+    const rng = seededRandom(hashString(seedKey));
     const posCount = 1 + Math.floor(rng() * 3);
     const positions = [];
     let remainingHires = entry.hireCount;
@@ -526,6 +549,7 @@ function resetFilters() {
   document.getElementById('freshSelect').value = '';
   document.getElementById('examSelect').value = '';
   document.getElementById('natureSelect').value = '';
+  document.getElementById('activeOnlyToggle').checked = false;
   document.getElementById('searchInput').value = '';
   document.getElementById('sortSelect').value = 'default';
   applyFilters();
@@ -587,14 +611,35 @@ function _applyFilters() {
   const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
   const exam = document.getElementById('examSelect').value;
   const nature = document.getElementById('natureSelect').value;
+  const activeOnly = document.getElementById('activeOnlyToggle').checked;
   const sort = document.getElementById('sortSelect').value;
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0); // 当天零点
 
   filteredData = allData.filter(item => {
     if (province && item.province !== province) return false;
     if (city && item.city !== city) return false;
-    if (keyword && !item.name.toLowerCase().includes(keyword)) return false;
     if (exam && item.examCategory !== exam) return false;
     if (nature && item.nature !== nature) return false;
+
+    // 仅看报名中
+    if (activeOnly) {
+      const dl = new Date(item.deadline + 'T23:59:59');
+      if (dl < now) return false;
+    }
+
+    // 搜索匹配单位名/岗位名/专业/城市
+    if (keyword) {
+      const searchTargets = [
+        item.name,
+        item.province,
+        item.city,
+        ...item.positions.map(p => p.name),
+        ...item.positions.map(p => p.major)
+      ].join(' ').toLowerCase();
+      if (!searchTargets.includes(keyword)) return false;
+    }
 
     if (edu || major || fresh) {
       const hasMatch = item.positions.some(p => {
@@ -634,6 +679,53 @@ function _applyFilters() {
   updateStats();
   renderCards();
   renderPagination();
+  saveFiltersToURL();
+}
+
+// URL 参数：保存/恢复筛选状态，支持分享链接
+function saveFiltersToURL() {
+  const params = new URLSearchParams();
+  const fields = ['provinceSelect','citySelect','eduSelect','majorSelect','ratioSelect','freshSelect','examSelect','natureSelect','sortSelect'];
+  for (const id of fields) {
+    const v = document.getElementById(id).value;
+    if (v) params.set(id.replace('Select',''), v);
+  }
+  const kw = document.getElementById('searchInput').value.trim();
+  if (kw) params.set('q', kw);
+  if (document.getElementById('activeOnlyToggle').checked) params.set('active', '1');
+  const str = params.toString();
+  window.location.hash = str ? '#' + str : '';
+}
+
+function restoreFiltersFromURL() {
+  if (!window.location.hash || window.location.hash === '#') return false;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const fields = { provinceSelect:'province', citySelect:'city', eduSelect:'edu', majorSelect:'major', ratioSelect:'ratio', freshSelect:'fresh', examSelect:'exam', natureSelect:'nature', sortSelect:'sort' };
+  let hadAny = false;
+  for (const [id, key] of Object.entries(fields)) {
+    const v = params.get(key);
+    if (v) {
+      if (id === 'provinceSelect') {
+        // 仅设置值并填充城市列表，不触发筛选
+        document.getElementById(id).value = v;
+        const citySel = document.getElementById('citySelect');
+        citySel.innerHTML = '<option value="">全部城市</option>';
+        if (provinceCityMap[v]) {
+          for (const city of provinceCityMap[v]) {
+            const opt = document.createElement('option');
+            opt.value = city; opt.textContent = city;
+            citySel.appendChild(opt);
+          }
+        }
+      } else {
+        document.getElementById(id).value = v;
+      }
+      hadAny = true;
+    }
+  }
+  if (params.get('q')) { document.getElementById('searchInput').value = params.get('q'); hadAny = true; }
+  if (params.get('active') === '1') { document.getElementById('activeOnlyToggle').checked = true; hadAny = true; }
+  return hadAny;
 }
 
 function renderCards() {
@@ -647,8 +739,19 @@ function renderCards() {
     noData.style.display = 'block';
   } else {
     noData.style.display = 'none';
-    grid.innerHTML = pageData.map(item => `
-      <div class="inst-card" onclick="openDetail(${item.id})">
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const threeDaysLater = new Date(now);
+    threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+
+    grid.innerHTML = pageData.map(item => {
+      const dl = new Date(item.deadline + 'T23:59:59');
+      let cardClass = '';
+      if (dl < now) cardClass = 'expired';
+      else if (dl <= threeDaysLater) cardClass = 'urgent';
+
+      return `
+      <div class="inst-card ${cardClass}" onclick="openDetail(${item.id})">
         <div class="card-header">
           <span class="inst-name">${item.name}</span>
           <span class="region-badge">${item.province} · ${item.city}</span>
@@ -742,6 +845,7 @@ document.addEventListener('keydown', function(e) {
 
 // ==================== START ====================
 initProvinceSelect();
+restoreFiltersFromURL();
 loadData();
 </script>
 
