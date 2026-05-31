@@ -170,12 +170,29 @@ def scrape_shiyebian():
         url = 'https://www.shiyebian.net/'
         req = urllib.request.Request(url, headers=make_headers())
         with urllib.request.urlopen(req, timeout=15) as resp:
-            html = resp.read().decode('utf-8', errors='ignore')
+            raw = resp.read()
+            # 网站编码为GBK，不是UTF-8
+            html = raw.decode('gbk', errors='ignore')
 
-        # 解析标题列表
-        # 格式: <a href="..." title="XXXX招聘公告">XXXX</a>
-        pattern = r'<a[^>]*title="([^"]*招聘[^"]*)"[^>]*>.*?</a>'
-        matches = re.findall(pattern, html)
+        # 解析标题列表 (支持两种格式)
+        # 格式1: <a ...>XXXX招聘公告</a>
+        # 格式2: <a title="XXXX招聘公告">...</a>
+        seen = set()
+        matches = []
+        # 优先匹配 title 属性
+        title_pat = r'<a[^>]*title="([^"]*(?:招聘|选调|遴选|引进|招录)[^"]*)"'
+        for m in re.findall(title_pat, html):
+            m = m.strip()
+            if len(m) > 8 and m not in seen:
+                seen.add(m)
+                matches.append(m)
+        # 再匹配链接文本
+        text_pat = r'<a[^>]*>([^<]*(?:招聘|选调|遴选|引进|招录)[^<]*)</a>'
+        for m in re.findall(text_pat, html):
+            m = re.sub(r'&#\d+;', '', m).strip()
+            if len(m) > 8 and m not in seen:
+                seen.add(m)
+                matches.append(m)
         for title in matches[:50]:  # 限制数量
             entry = parse_entry_from_title(title)
             if entry:
@@ -347,7 +364,13 @@ def main():
     with open(OUTPUT_PATH, 'w', encoding='utf-8') as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
-    print(f'\n[OK] Written to {OUTPUT_PATH}')
+    # 同时生成 data.js
+    js_path = os.path.join(os.path.dirname(__file__), 'data.js')
+    js_content = '// 全国事业编招聘数据 - 自动生成\n// 更新时间: ' + output['metadata']['lastUpdated'] + '\nwindow.zhaopinData = ' + json.dumps(output, ensure_ascii=False, indent=2) + ';\n'
+    with open(js_path, 'w', encoding='utf-8') as f:
+        f.write(js_content)
+
+    print(f'\n[OK] Written to {OUTPUT_PATH} + data.js')
     print(f'   总共 {len(merged)} 条记录')
 
 if __name__ == '__main__':
