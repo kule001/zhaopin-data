@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-通过 GitHub API 上传 data.json 到仓库
+通过 GitHub API 上传 data.json + data.js 到仓库
 因为 github.com 被墙，使用 api.github.com 进行文件上传
 """
 import json
@@ -15,8 +15,7 @@ from datetime import datetime
 REPO = "kule001/zhaopin-data"
 BRANCH = "main"
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
-FILE_PATH = "data.json"
-LOCAL_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 API_BASE = f"https://api.github.com/repos/{REPO}"
 
@@ -40,50 +39,39 @@ def github_request(method, url, data=None):
             return json.loads(resp.read().decode())
     except urllib.error.HTTPError as e:
         error_body = e.read().decode()
-        print(f"  API Error {e.code}: {error_body}")
+        print(f"  API Error {e.code}: {error_body[:300]}")
         return None
 
 
-def get_file_sha():
-    """获取远程文件当前 SHA（需要用于更新）"""
-    url = f"{API_BASE}/contents/{FILE_PATH}?ref={BRANCH}"
-    result = github_request("GET", url)
-    if result and "sha" in result:
-        return result["sha"]
-    return None
-
-
-def upload_file():
-    """上传/更新文件到 GitHub"""
-    if not os.path.exists(LOCAL_FILE):
-        print(f"  ❌ 文件不存在: {LOCAL_FILE}")
+def upload_single_file(file_path, remote_path, commit_msg):
+    """上传单个文件到 GitHub"""
+    local_path = os.path.join(SCRIPT_DIR, file_path)
+    if not os.path.exists(local_path):
+        print(f"  [WARN] Skip {file_path}: file not found")
         return False
 
-    if not TOKEN:
-        print("  ❌ 缺少 GITHUB_TOKEN 环境变量")
-        return False
-
-    with open(LOCAL_FILE, "r", encoding="utf-8") as f:
+    with open(local_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     encoded = base64.b64encode(content.encode("utf-8")).decode("ascii")
 
-    # 获取当前 SHA（如果是已存在的文件）
-    sha = get_file_sha()
+    # 获取当前 SHA
+    sha = None
+    result = github_request("GET", f"{API_BASE}/contents/{remote_path}?ref={BRANCH}")
+    if result and "sha" in result:
+        sha = result["sha"]
 
     body = {
-        "message": f"update data: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        "message": commit_msg,
         "content": encoded,
         "branch": BRANCH,
     }
     if sha:
         body["sha"] = sha
 
-    url = f"{API_BASE}/contents/{FILE_PATH}"
-    result = github_request("PUT", url, body)
-
+    result = github_request("PUT", f"{API_BASE}/contents/{remote_path}", body)
     if result and "content" in result:
-        print(f"  [OK] Upload: {result['content']['html_url']}")
+        print(f"  [OK] Upload {remote_path}: {result['content']['html_url']}")
         return True
     return False
 
@@ -92,12 +80,26 @@ def main():
     print(f"=== GitHub API Upload ===")
     print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Repo: {REPO}")
-    print(f"File: {FILE_PATH}")
 
-    if upload_file():
-        print("[OK] Done")
+    if not TOKEN:
+        print("  [FAIL] 缺少 GITHUB_TOKEN 环境变量")
+        sys.exit(1)
+
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M")
+    ok = True
+
+    # 1) Push data.json
+    if not upload_single_file("data.json", "data.json", f"update data.json: {ts}"):
+        ok = False
+
+    # 2) Push data.js (auto-generated from data.json)
+    if not upload_single_file("data.js", "data.js", f"update data.js: {ts}"):
+        ok = False
+
+    if ok:
+        print("[OK] All files pushed")
     else:
-        print("[FAIL] Upload failed")
+        print("[WARN] Some files failed to push")
         sys.exit(1)
 
 
