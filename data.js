@@ -1,9 +1,9 @@
 // 全国事业编招聘数据 - 自动生成
-// 更新时间: 2026-06-06T07:54:42+08:00
+// 更新时间: 2026-06-07T07:54:45+08:00
 window.zhaopinData = {
   "metadata": {
     "version": "1.0",
-    "lastUpdated": "2026-06-06T07:54:42+08:00",
+    "lastUpdated": "2026-06-07T07:54:45+08:00",
     "source": "shiyebian.com / offcn.com / 各省市人社局 / 手动录入",
     "totalEntries": 28,
     "precision": "★★★",
@@ -73,8 +73,8 @@ window.zhaopinData = {
       "province": "四川",
       "city": "绵阳",
       "hireCount": 14,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -83,8 +83,8 @@ window.zhaopinData = {
       "province": "湖北",
       "city": "鄂州",
       "hireCount": 4,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -93,8 +93,8 @@ window.zhaopinData = {
       "province": "湖北",
       "city": "鄂州",
       "hireCount": 5,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -103,8 +103,8 @@ window.zhaopinData = {
       "province": "山西",
       "city": "晋城",
       "hireCount": 10,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -113,8 +113,8 @@ window.zhaopinData = {
       "province": "广西",
       "city": "南宁",
       "hireCount": 12,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -123,8 +123,8 @@ window.zhaopinData = {
       "province": "山西",
       "city": "太原",
       "hireCount": 1,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -133,8 +133,8 @@ window.zhaopinData = {
       "province": "山西",
       "city": "晋中",
       "hireCount": 1,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -143,8 +143,8 @@ window.zhaopinData = {
       "province": "山东",
       "city": "济南",
       "hireCount": 45,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -153,8 +153,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 7,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "E",
       "nature": "est"
     },
@@ -163,8 +163,8 @@ window.zhaopinData = {
       "province": "青海",
       "city": "西宁",
       "hireCount": 2,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -173,8 +173,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 2,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -183,8 +183,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 7,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -193,8 +193,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 2,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -203,8 +203,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 2,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "B",
       "nature": "est"
     },
@@ -213,8 +213,8 @@ window.zhaopinData = {
       "province": "上海",
       "city": "浦东新区",
       "hireCount": 11,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -223,8 +223,8 @@ window.zhaopinData = {
       "province": "北京",
       "city": "东城区",
       "hireCount": 100,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "hire"
     },
@@ -233,8 +233,8 @@ window.zhaopinData = {
       "province": "北京",
       "city": "东城区",
       "hireCount": 1,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -243,8 +243,8 @@ window.zhaopinData = {
       "province": "天津",
       "city": "和平区",
       "hireCount": 20,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "E",
       "nature": "est"
     },
@@ -253,8 +253,8 @@ window.zhaopinData = {
       "province": "重庆",
       "city": "长寿区",
       "hireCount": 1,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "D",
       "nature": "est"
     },
@@ -263,8 +263,8 @@ window.zhaopinData = {
       "province": "北京",
       "city": "东城区",
       "hireCount": 2,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "A",
       "nature": "est"
     },
@@ -273,8 +273,8 @@ window.zhaopinData = {
       "province": "青海",
       "city": "西宁",
       "hireCount": 21,
-      "announceDate": "2026-06-06",
-      "deadline": "2026-06-20",
+      "announceDate": "2026-06-07",
+      "deadline": "2026-06-21",
       "examCategory": "E",
       "nature": "est"
     },
